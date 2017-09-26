@@ -2,7 +2,7 @@
 #define SEARCH_H
 
 /**
- * This class contains all four search methods.
+ * This class contains all four searching methods.
 */
 class Search
 {
