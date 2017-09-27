@@ -23,35 +23,6 @@ int wid = 0;
 int hei = -1;
 vector<char> maze;
 vector<bool> visited;
-bool canTravel(int x, int y, int dir)
-{
-    int tempx = x;
-    int tempy = y;
-    if (dir == 0)
-    {
-        if (++tempx < wid && visited[tempx + wid * tempy] == false && maze[tempx + wid * tempy] != '%')
-            return true;
-        return false;
-    }
-    else if (dir == 1)
-    {
-        if (++tempy < hei && visited[tempx + wid * tempy] == false && maze[tempx + wid * tempy] != '%')
-            return true;
-        return false;
-    }
-    else if (dir == 2)
-    {
-        if (--tempx >= 0 && visited[tempx + wid * tempy] == false && maze[tempx + wid * tempy] != '%')
-            return true;
-        return false;
-    }
-    else
-    {
-        if (--tempy >= 0 && visited[tempx + wid * tempy] == false && maze[tempx + wid * tempy] != '%')
-            return true;
-        return false;
-    }
-}
 
 float heuristic(float x, float y, float goalx, float goaly)
 {
@@ -87,7 +58,7 @@ void aStar(int x, int y, int finalx, int finaly)
             {
                 int tempx = currx;
                 int tempy = curry;
-                if (canTravel(x, y, i))
+                if (canTravel(currx, curry, i))
                 {
                     if (i == 0)
                         tempx++;
@@ -134,6 +105,7 @@ void dfs(int x, int y)
         dfs(x, y - 1);
     }
 }
+
 int main()
 {
     ifstream inFile;
