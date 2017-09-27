@@ -4,9 +4,9 @@
 #define UNVISITED false;
 #define VISITED true;
 #define RIGHT 0;
-#define UP 1;
+#define DOWN 1;
 #define LEFT 2;
-#define DOWN 3;
+#define UP 3;
 
 vector<bool> visited; // Keep track of visiting status
 
@@ -93,9 +93,9 @@ Solution Search::BFS(vector<string> maze, int x, int y)
             q.push(next);
             sol.nodes++;
         }
-        if (canTravel(maze, currX, currY, UP))
+        if (canTravel(maze, currX, currY, DOWN))
         {
-            dir[currX][currY + 1] = UP;
+            dir[currX][currY + 1] = DOWN;
             visited[currX + wid * (currY + 1)] = true;
             pair<int, int> next(currX, currY + 1);
             q.push(next);
@@ -109,9 +109,9 @@ Solution Search::BFS(vector<string> maze, int x, int y)
             q.push(next);
             sol.nodes++;
         }
-        if (canTravel(maze, currX, currY, DOWN))
+        if (canTravel(maze, currX, currY, UP))
         {
-            dir[currX][currY - 1] = DOWN;
+            dir[currX][currY - 1] = UP;
             visited[currX + wid * (currY - 1)] = true;
             pair<int, int> next(currX, currY - 1);
             q.push(next);
@@ -127,13 +127,13 @@ Solution Search::BFS(vector<string> maze, int x, int y)
         case RIGHT:
             endX--;
             break;
-        case UP:
+        case DOWN:
             endY--;
             break;
         case LEFT:
             endX++;
             break;
-        case DOWN:
+        case UP:
             endY++;
             break;
         default:
