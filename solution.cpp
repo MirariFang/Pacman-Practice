@@ -20,7 +20,7 @@ Solution::~Solution()
 void Solution::drawSolution(string file_name, vector<string> maze, int x, int y)
 {
     ofstream myfile;
-    myfile.open("mp1_1_solution.txt");
+    myfile.open(file_name);
     for (int i = 0; i < path.size(); i++)
     {
         switch (path[i])
