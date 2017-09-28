@@ -45,7 +45,7 @@ bool canTravel(vector<string> maze, int x, int y, int dir)
         if (x + 1 < wid && visited[x + 1 + wid * y] == false && maze[y][x + 1] != '%')
             return true;
     }
-    else if (dir == UP)
+    else if (dir == DOWN)
     {
         if (y + 1 < hei && visited[x + wid * (y + 1)] == false && maze[y + 1][x] != '%')
             return true;
@@ -227,6 +227,7 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
     Solution sol;
     int wid = maze[0].length();
     int hei = maze.size();
+    visit_init(visited, wid * hei);
     int finalposition = finalx + finaly * wid;
     std::priority_queue<node> pq;
     vector<float> costs; // cost to go to every node
