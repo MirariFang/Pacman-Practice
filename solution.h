@@ -18,14 +18,14 @@ class Solution
     int path_cost;    // The path cost of the solution, defined as the number of steps taken to get from the initial state to the goal state.
     int nodes;        // Number of nodes expanded by the search algorithm.
 
-    // Default constructor
     Solution();
+    Solution(Solution &other); 
 
     ~Solution();
 
     // Draw the solution path and write output to a file
     // x, y are the coordinates of the starting point
-    void drawSolution(string file_name, vector<string> maze, int x. int y);
+    void drawSolution(string file_name, vector<string> maze, int x,  int y);
 };
 
 #endif

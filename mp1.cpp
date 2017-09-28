@@ -5,109 +5,23 @@
 #include <queue>
 #include <limits>
 #include <cmath>
+#include <string>
+#include "solution.h"
+#include "search.h"
 using namespace std;
 
-class node
-{
-  public:
-    int position;
-    float cost;
-    node(int i, float c) : position(i), cost(c) {}
-};
-bool operator<(const node n1, const node n2)
-{
-    return n1.cost > n2.cost;
-}
+vector<string> maze;
 
-int wid = 0;
-int hei = -1;
-vector<char> maze;
-vector<bool> visited;
-
-float heuristic(float x, float y, float goalx, float goaly)
+Solution do_search(vector<string> m, int x, int y, int tx, int ty)
 {
-    return (float)(abs(x - goalx) + abs(y - goaly));
-}
-
-void aStar(int x, int y, int finalx, int finaly)
-{
-    int finalposition = finalx + finaly * wid;
-    std::priority_queue<node> pq;
-    vector<float> costs; // cost to go to every node
-    costs.resize(wid * (hei + 1));
-    for (int i = 0; i < costs.size(); i++)
-    {
-        costs[i] = std::numeric_limits<float>::infinity();
-    }
-    costs[x + y * wid] = 0; // initialize start state
-    pq.push(node(x + y * wid, 0));
-    while (!pq.empty())
-    {
-        node curr = pq.top();
-        pq.pop();
-        if (curr.position == finalposition)
-        {
-            cout << "found" << endl;
-            break;
-        }
-        else
-        {
-            int currx = curr.position % wid;
-            int curry = curr.position / wid;
-            for (int i = 0; i < 4; i++)
-            {
-                int tempx = currx;
-                int tempy = curry;
-                if (canTravel(currx, curry, i))
-                {
-                    if (i == 0)
-                        tempx++;
-                    if (i == 1)
-                        tempy++;
-                    if (i == 2)
-                        tempx--;
-                    if (i == 3)
-                        tempy--;
-                    float newcost = costs[curr.position] + 1;
-                    if (newcost < costs[tempx + tempy * wid])
-                    {
-                        costs[tempx + tempy * wid] = newcost;
-                        float predict = newcost + heuristic(tempx, tempy, finalx, finaly);
-                        pq.push(node(tempx + tempy * wid, predict));
-                    }
-                }
-            }
-        }
-    }
-}
-void dfs(int x, int y)
-{
-    visited[x + y * wid] = true;
-    if (maze[x + y * wid] == '.')
-    {
-        cout << "Found" << endl;
-        exit(0);
-    }
-    if (canTravel(x, y, 0))
-    {
-        dfs(x + 1, y);
-    }
-    if (canTravel(x, y, 1))
-    {
-        dfs(x, y + 1);
-    }
-    if (canTravel(x, y, 2))
-    {
-        dfs(x - 1, y);
-    }
-    if (canTravel(x, y, 3))
-    {
-        dfs(x, y - 1);
-    }
+    //TODO: Choose searching algorithm
+    Solution sol = BFS(m, x, y, tx, ty);
+    return sol;
 }
 
 int main()
 {
+    // Read input file
     ifstream inFile;
     inFile.open("maze.txt");
     string temp;
@@ -120,24 +34,28 @@ int main()
         getline(inFile, temp);
         if (temp.compare("") == 0)
             break;
-        wid = temp.length();
-        hei++;
-        for (size_t i = 0; i < wid; i++)
+        maze.push_back(temp);
+    }
+    // Find start point and end point
+    for (int i = 0; i < temp.size(); i++)
+    {
+        // i - y coordinate
+        for (int j = 0; j < temp[i].length(); j++)
         {
-            maze.push_back(temp[i]);
-            if (temp[i] == 'P')
+            // j - x coordinate
+            if (maze[i][j] == 'P')
             {
-                startx = i;
-                starty = hei;
+                startx = j;
+                starty = i;
             }
-            else if (temp[i] == '.')
+            if (maze[i][j] == '.')
             {
-                finalx = i;
-                finaly = hei;
+                finalx = j;
+                finaly = i;
             }
         }
     }
-    visited.resize(wid * (hei + 1));
-    aStar(startx, starty, finalx, finaly);
+    Solution sol = do_search(maze, startx, starty, finalx, finaly);
+    sol.drawSolution("mp1_1_sol.txt", maze, startx, starty);
     return 0;
 }

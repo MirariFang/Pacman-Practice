@@ -15,10 +15,10 @@ using namespace std;
 class Search
 {
   public:
-    void DFS(vector<string> maze, int x, int y);
-    Solution BFS(vector<string> maze, int x, int y);
-    void greedy(int x, int y);
-    void A_star(int x, int y);
+    static Solution DFS(vector<string> maze, int x, int y, int tx, int ty);
+    static Solution BFS(vector<string> maze, int x, int y, int tx, int ty);
+    static void greedy(int x, int y);
+    static Solution A_star(vector<string> maze, int x, int y, int finalx, int finaly);
 
   private:
     void visit_init(vector<bool> &visit);

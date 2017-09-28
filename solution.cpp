@@ -12,6 +12,14 @@ Solution::Solution()
     nodes = 0;
 }
 
+// Copy constructor
+Solution::Solution(Solution &other)
+{
+    path = new vector<int>(other.path);
+    path_cost = other.path_cost;
+    nodes = other.nodes;
+}
+
 Solution::~Solution()
 {
     delete path;
@@ -26,19 +34,19 @@ void Solution::drawSolution(string file_name, vector<string> maze, int x, int y)
         switch (path[i])
         {
             case RIGHT:
-                maze[x + 1][y] = '.';
+                maze[y][x + 1] = '.';
                 x++;
                 break;
             case DOWN:
-                maze[x][y - 1] = '.';
+                maze[y - 1][x] = '.';
                 y--;
                 break;
             case LEFT:
-                maze[x - 1][y] = '.';
+                maze[y][x - 1] = '.';
                 x--;
                 break;
             case UP:
-                maze[x][y + 1] = '.';
+                maze[y + 1][x] = '.';
                 y++;
                 break;
         }
@@ -47,6 +55,9 @@ void Solution::drawSolution(string file_name, vector<string> maze, int x, int y)
     {
         myfile << maze[i];
     }
+    // Print other informations
+    myfile << endl;
+    myfile << "Path cost: " << path_cost << endl;
+    myfile << "Number of nodes expanded: " << nodes << endl;
     myfile.close();
-    return;
 }
