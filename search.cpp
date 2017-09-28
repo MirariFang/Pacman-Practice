@@ -316,9 +316,82 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
     return sol;
 }
 
-Solution Search::greedy(int x, int y)
+void greedy(vector<string> maze, int x, int y, int finalx, int finaly)
 {
-    //TODO: Greedy search
-    Solution sol;
-    return sol;
-}
+    //Solution sol();
+    visit_init(visited, maze.size() * maze[0].length());
+    int wid = maze[0].length();
+    int hei = maze.size();
+    int finalposition = finalx + finaly * wid;
+    std::priority_queue<node> pq;
+    pq.push(node(x + y * wid, heuristic(x, y, finalx, finaly)));
+    vector<vector<int> > dir; // The moving direction of the Pacman
+    // Initialize dir
+    for (int i = 0; i < wid; i++)
+    {
+        vector<int> v;
+        dir.push_back(v);
+        for (int j = 0; j < hei; j++)
+        {
+            dir[i].push_back(-1);
+        }
+    }
+    while (!pq.empty())
+    {
+        node curr = pq.top();
+        pq.pop();
+        nodes_expand++;
+      //  sol.nodes++;
+        if (curr.position == finalposition)
+        {
+          cout << "found" << endl;
+            break;
+        }
+        else
+        {
+            int currx = curr.position % wid;
+            int curry = curr.position / wid;
+            if (!visited[currx + curry * wid]){
+            visited[currx + curry * wid] = VISITED;
+            for (int i = 0; i < 4; i++)
+            {
+                int tempx = currx;
+                int tempy = curry;
+                if (canTravel(maze, currx, curry, i))
+                {
+                    if (i == RIGHT){
+                        tempx++;
+                        if (!visited[tempx + tempy * wid]){
+                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                        dir[tempx][tempy] = i;
+                        }
+                    }
+                    if (i == DOWN){
+                        tempy++;
+                        if (!visited[tempx + tempy * wid]){
+                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                        dir[tempx][tempy] = i;
+                        }
+                    }
+                    if (i == LEFT){
+                        tempx--;
+                        if (!visited[tempx + tempy * wid]){
+                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                        dir[tempx][tempy] = i;
+                        }
+                    }
+                    if (i == UP){
+                        tempy--;
+                        if (!visited[tempx + tempy * wid]){
+                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                        dir[tempx][tempy] = i;
+                        }
+                    }
+                }//end of if canTravel
+            }
+          }//end of if not-visited
+        }
+    }
+cout <<"nodes_expand: "<< nodes_expand <<endl;
+}//end of greedy, cost is manhattan distance in greedy
+
