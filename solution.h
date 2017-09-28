@@ -21,8 +21,6 @@ class Solution
     Solution();
     Solution(Solution &other); 
 
-    ~Solution();
-
     // Draw the solution path and write output to a file
     // x, y are the coordinates of the starting point
     void drawSolution(string file_name, vector<string> maze, int x,  int y);

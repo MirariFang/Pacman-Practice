@@ -1,38 +1,27 @@
-EXE_ONE = mp1
-
-OBJS_DIR = .objs
-
-OBJS = search.o solution.o
+EXENAME = mp1
+OBJS = mp1.o search.o solution.o
 
 CXX = clang++
+CXXFLAGS = -std=c++1y -c -g -O0 -Wall -Wextra -pedantic
 LD = clang++
-WARNINGS = -pedantic -Wall -Werror -Wfatal-errors -Wextra -Wno-unused-parameter -Wno-unused-variable
-CXXFLAGS = -std=c++1y -stdlib=libc++ -g -O0 $(WARNINGS) -MMD -MP -msse2 -c -L/usr/include/
-CXXFLAGS_PROVIDED = -O2
-CXXFLAGS_STUDENT = -O0
-LDFLAGS = -std=c++1y -stdlib=libc++ -lpng -lc++abi -lpthread -L/usr/include/
-ASANFLAGS = -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS = -std=c++1y -lpthread
 
-all: mp1.1 #mp1.2
-mp1.1: $(EXE_ONE)
+all : $(EXENAME)
 
-# Pattern rules for object files
-$(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_STUDENT) $< -o $@
+$(EXENAME) : $(OBJS)
+	$(LD) $(OBJS) $(LDFLAGS) -o $(EXENAME)
 
-# Create directories
-$(OBJS_DIR):
-	@mkdir -p $(OBJS_DIR)
+mp1.o : mp1.cpp search.h solution.h
+	$(CXX) $(CXXFLAGS) mp1.cpp
 
-$(EXE_ONE):
-	$(LD) $^ $(LDFLAGS) -o $@
+search.o : search.cpp search.h solution.h
+	$(CXX) $(CXXFLAGS) search.cpp
 
-$(EXE_ONE):               $(patsubst %.o, $(OBJS_DIR)/%.o,      $(OBJS))
+solution.o : solution.cpp solution.h
+	$(CXX) $(CXXFLAGS) solution.cpp
 
-# Include automatically generated dependencies
--include $(OBJS_DIR)/*.d
+clean :
+	-rm -f *.o $(EXENAME)
 
-clean:
-	rm -rf $(EXE) $(OBJS_DIR)
-
-.PHONY: all mp1.1 mp1.2 clean
+tidy:
+	-rm -f *.o

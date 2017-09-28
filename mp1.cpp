@@ -2,9 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <queue>
-#include <limits>
-#include <cmath>
 #include <string>
 #include "solution.h"
 #include "search.h"
@@ -15,7 +12,8 @@ vector<string> maze;
 Solution do_search(vector<string> m, int x, int y, int tx, int ty)
 {
     //TODO: Choose searching algorithm
-    Solution sol = BFS(m, x, y, tx, ty);
+    Solution sol;
+    sol = Search::BFS(m, x, y, tx, ty);
     return sol;
 }
 
@@ -37,10 +35,10 @@ int main()
         maze.push_back(temp);
     }
     // Find start point and end point
-    for (int i = 0; i < temp.size(); i++)
+    for (int i = 0; i < (int)maze.size(); i++)
     {
         // i - y coordinate
-        for (int j = 0; j < temp[i].length(); j++)
+        for (int j = 0; j < maze[i].length(); j++)
         {
             // j - x coordinate
             if (maze[i][j] == 'P')
@@ -55,7 +53,8 @@ int main()
             }
         }
     }
-    Solution sol = do_search(maze, startx, starty, finalx, finaly);
+    Solution sol;
+    sol = do_search(maze, startx, starty, finalx, finaly);
     sol.drawSolution("mp1_1_sol.txt", maze, startx, starty);
     return 0;
 }

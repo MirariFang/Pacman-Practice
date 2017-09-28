@@ -36,7 +36,7 @@ void visit_init(vector<bool> &visit, int n)
 /**
  * A helper function that tells whether the pacman can travel to a certain direction
  */
-bool Search::canTravel(vector<string> maze, int x, int y, int dir)
+bool canTravel(vector<string> maze, int x, int y, int dir)
 {
     int wid = maze[0].length();
     int hei = maze.size();
@@ -74,51 +74,52 @@ Solution DFS_recursive(vector<string> maze, int x, int y, int tx, int ty, Soluti
         return newSol;
     }
     newSol.path_cost++;
-    Solution retSol();
+    Solution retSol;
     if (canTravel(maze, x, y, RIGHT))
     {
         nodes_expand++;
         newSol.path.push_back(RIGHT);
         if (retSol.path.size() == 0)
-            retSol = DFS(maze, x + 1, y, tx, ty, newSol);
+            retSol = DFS_recursive(maze, x + 1, y, tx, ty, newSol);
     }
     if (canTravel(maze, x, y, DOWN))
     {
         nodes_expand++;
         newSol.path.push_back(DOWN);
         if (retSol.path.size() == 0)
-            retSol = DFS(maze, x, y + 1, tx, ty, newSol);
+            retSol = DFS_recursive(maze, x, y + 1, tx, ty, newSol);
     }
     if (canTravel(maze, x, y, LEFT))
     {
         nodes_expand++;
         newSol.path.push_back(LEFT);
         if (retSol.path.size() == 0)
-            retSol = DFS(maze, x - 1, y, tx, ty, newSol);
+            retSol = DFS_recursive(maze, x - 1, y, tx, ty, newSol);
     }
     if (canTravel(maze, x, y, UP))
     {
         nodes_expand++;
         newSol.path.push_back(UP);
         if (retSol.path.size() == 0)
-            retSol = DFS(maze, x, y - 1, tx, ty, newSol);
+            retSol = DFS_recursive(maze, x, y - 1, tx, ty, newSol);
     }
     return retSol;
 }
 
-static Solution Search::DFS(vector<string> maze, int x, int y, int tx, int ty)
+Solution Search::DFS(vector<string> maze, int x, int y, int tx, int ty)
 {
     int wid = maze[0].length();
     int hei = maze.size();
     visit_init(visited, wid * hei);
-    Solution currSol();
+    Solution currSol;
     nodes_expand++;
-    Solution sol = DFS_recursive(maze, x, y, tx, ty, currSol);
+    Solution sol;
+    sol = DFS_recursive(maze, x, y, tx, ty, currSol);
     sol.nodes = nodes_expand;
     return sol;
 }
 
-static Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
+Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
 {
     int wid = maze[0].length();
     int hei = maze.size();
@@ -127,28 +128,30 @@ static Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
     // Initialize dir
     for (int i = 0; i < wid; i++)
     {
-        dir.push_back(new vector<int>());
+        vector<int> temp;
+        dir.push_back(temp);
         for (int j = 0; j < hei; j++)
         {
             dir[i].push_back(-1);
         }
     }
     // Construct solution
-    Solution S();
+    Solution sol;
     // Represent each point as a pair
     queue<pair<int, int>> q;
     pair<int, int> start(x, y);
     visited[x + wid * y] = true;
     q.push(start);
     sol.nodes++;
-    int endX, endY;
+    int endX = tx;
+    int endY = ty;
     while (!q.empty())
     {
         pair<int, int> curr = q.front();
         q.pop();
         int currX = curr.first;
         int currY = curr.second;
-        if (currX = tx && currY = ty)
+        if (currX == tx && currY == ty)
         {
             endX = currX;
             endY = currY;
@@ -191,7 +194,7 @@ static Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
     {
         sol.path.insert(sol.path.begin(), dir[endX][endY]);
         sol.path_cost++;
-        swith(dir[endX][endY])
+        switch (dir[endX][endY])
         {
         case RIGHT:
             endX--;
@@ -207,7 +210,7 @@ static Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
             break;
         default:
             fprintf(stderr, "ERROR: out of bound\n");
-            return;
+            exit(1);
         }
     }
     return sol;
@@ -219,16 +222,16 @@ float heuristic(float x, float y, float goalx, float goaly)
     return (float)(abs(x - goalx) + abs(y - goaly));
 }
 
-static Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int finaly)
+Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int finaly)
 {
-    Solution sol();
+    Solution sol;
     int wid = maze[0].length();
     int hei = maze.size();
     int finalposition = finalx + finaly * wid;
     std::priority_queue<node> pq;
     vector<float> costs; // cost to go to every node
     costs.resize(wid * (hei + 1));
-    for (int i = 0; i < costs.size(); i++)
+    for (size_t i = 0; i < costs.size(); i++)
     {
         costs[i] = std::numeric_limits<float>::infinity();
     }
@@ -238,7 +241,8 @@ static Solution Search::A_star(vector<string> maze, int x, int y, int finalx, in
     // Initialize dir
     for (int i = 0; i < wid; i++)
     {
-        dir.push_back(new vector<int>());
+        vector<int> temp;
+        dir.push_back(temp);
         for (int j = 0; j < hei; j++)
         {
             dir[i].push_back(-1);
@@ -261,7 +265,7 @@ static Solution Search::A_star(vector<string> maze, int x, int y, int finalx, in
             {
                 int tempx = currx;
                 int tempy = curry;
-                if (canTravel(currx, curry, i))
+                if (canTravel(maze, currx, curry, i))
                 {
                     if (i == RIGHT)
                         tempx++;
@@ -289,7 +293,7 @@ static Solution Search::A_star(vector<string> maze, int x, int y, int finalx, in
     {
         sol.path.insert(sol.path.begin(), dir[endX][endY]);
         sol.path_cost++;
-        swith(dir[endX][endY])
+        switch(dir[endX][endY])
         {
         case RIGHT:
             endX--;
@@ -305,14 +309,15 @@ static Solution Search::A_star(vector<string> maze, int x, int y, int finalx, in
             break;
         default:
             fprintf(stderr, "ERROR: out of bound\n");
-            return;
+            exit(1);
         }
     }
     return sol;
 }
 
-static Solution Search::greedy(int x, int y)
+Solution Search::greedy(int x, int y)
 {
     //TODO: Greedy search
-    return Solution();
+    Solution sol;
+    return sol;
 }

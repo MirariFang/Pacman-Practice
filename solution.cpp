@@ -7,7 +7,6 @@
 
 Solution::Solution()
 {
-    path = new vector<int>();
     path_cost = 0;
     nodes = 0;
 }
@@ -15,21 +14,16 @@ Solution::Solution()
 // Copy constructor
 Solution::Solution(Solution &other)
 {
-    path = new vector<int>(other.path);
+    path = other.path;
     path_cost = other.path_cost;
     nodes = other.nodes;
-}
-
-Solution::~Solution()
-{
-    delete path;
 }
 
 void Solution::drawSolution(string file_name, vector<string> maze, int x, int y)
 {
     ofstream myfile;
     myfile.open(file_name);
-    for (int i = 0; i < path.size(); i++)
+    for (size_t i = 0; i < path.size(); i++)
     {
         switch (path[i])
         {
@@ -51,7 +45,7 @@ void Solution::drawSolution(string file_name, vector<string> maze, int x, int y)
                 break;
         }
     }
-    for (int i = 0; i < maze.size(); i++)
+    for (size_t i = 0; i < maze.size(); i++)
     {
         myfile << maze[i];
     }
