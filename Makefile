@@ -1,5 +1,5 @@
 EXENAME = mp1
-OBJS = mp1.o search.o solution.o
+OBJS = mp1.o search.o solution.o test.o
 
 CXX = clang++
 CXXFLAGS = -std=c++1y -c -g -O0 -Wall -Wextra -pedantic
@@ -19,6 +19,9 @@ search.o : search.cpp search.h solution.h
 
 solution.o : solution.cpp solution.h
 	$(CXX) $(CXXFLAGS) solution.cpp
+
+test.o : test.cpp test.h
+	$(CXX) $(CXXFLAGS) test.cpp
 
 clean :
 	-rm -f *.o $(EXENAME)

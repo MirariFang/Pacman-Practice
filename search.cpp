@@ -1,5 +1,6 @@
 #include "search.h"
 #include "solution.h"
+#include "test.h"
 
 #define UNVISITED false
 #define VISITED true
@@ -126,13 +127,13 @@ Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
     visit_init(visited, wid * hei);
     vector<vector<int>> dir; // The moving direction of the Pacman
     // Initialize dir
-    for (int i = 0; i < wid; i++)
+    for (int i = 0; i < hei; i++)
     {
         vector<int> temp;
         dir.push_back(temp);
-        for (int j = 0; j < hei; j++)
+        for (int j = 0; j < wid; j++)
         {
-            dir[i].push_back(-1);
+            dir[i].push_back(4);
         }
     }
     // Construct solution
@@ -153,13 +154,11 @@ Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
         int currY = curr.second;
         if (currX == tx && currY == ty)
         {
-            endX = currX;
-            endY = currY;
             break;
         }
         if (canTravel(maze, currX, currY, RIGHT))
         {
-            dir[currX + 1][currY] = RIGHT;
+            dir[currY][currX + 1] = RIGHT;
             visited[currX + 1 + wid * currY] = true;
             pair<int, int> next(currX + 1, currY);
             q.push(next);
@@ -167,7 +166,7 @@ Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
         }
         if (canTravel(maze, currX, currY, DOWN))
         {
-            dir[currX][currY + 1] = DOWN;
+            dir[currY + 1][currX] = DOWN;
             visited[currX + wid * (currY + 1)] = true;
             pair<int, int> next(currX, currY + 1);
             q.push(next);
@@ -175,7 +174,7 @@ Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
         }
         if (canTravel(maze, currX, currY, LEFT))
         {
-            dir[currX - 1][currY] = LEFT;
+            dir[currY][currX - 1] = LEFT;
             visited[currX - 1 + wid * currY] = true;
             pair<int, int> next(currX - 1, currY);
             q.push(next);
@@ -183,18 +182,19 @@ Solution Search::BFS(vector<string> maze, int x, int y, int tx, int ty)
         }
         if (canTravel(maze, currX, currY, UP))
         {
-            dir[currX][currY - 1] = UP;
+            dir[currY - 1][currX] = UP;
             visited[currX + wid * (currY - 1)] = true;
             pair<int, int> next(currX, currY - 1);
             q.push(next);
             sol.nodes++;
         }
     }
-    while (endX != x && endY != y)
+    while (!(endX == x && endY == y))
     {
-        sol.path.insert(sol.path.begin(), dir[endX][endY]);
+        sol.path.insert(sol.path.begin(), dir[endY][endX]);
         sol.path_cost++;
-        switch (dir[endX][endY])
+        maze[endY][endX] = '.';
+        switch (dir[endY][endX])
         {
         case RIGHT:
             endX--;
@@ -316,7 +316,7 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
     return sol;
 }
 
-void greedy(vector<string> maze, int x, int y, int finalx, int finaly)
+void Search::greedy(vector<string> maze, int x, int y, int finalx, int finaly)
 {
     //Solution sol();
     visit_init(visited, maze.size() * maze[0].length());
@@ -392,6 +392,6 @@ void greedy(vector<string> maze, int x, int y, int finalx, int finaly)
           }//end of if not-visited
         }
     }
-cout <<"nodes_expand: "<< nodes_expand <<endl;
+    cout <<"nodes_expand: "<< nodes_expand <<endl;
 }//end of greedy, cost is manhattan distance in greedy
 

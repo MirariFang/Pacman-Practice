@@ -21,7 +21,7 @@ class Search
   public:
     static Solution DFS(vector<string> maze, int x, int y, int tx, int ty);
     static Solution BFS(vector<string> maze, int x, int y, int tx, int ty);
-    static Solution greedy(int x, int y);
+    static void greedy(vector<string> maze, int x, int y, int finalx, int finaly);
     static Solution A_star(vector<string> maze, int x, int y, int finalx, int finaly);
 
 //   private:

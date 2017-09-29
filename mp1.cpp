@@ -5,6 +5,7 @@
 #include <string>
 #include "solution.h"
 #include "search.h"
+#include "test.h"
 using namespace std;
 
 vector<string> maze;
@@ -38,7 +39,7 @@ int main()
     for (int i = 0; i < (int)maze.size(); i++)
     {
         // i - y coordinate
-        for (int j = 0; j < maze[i].length(); j++)
+        for (int j = 0; j < (int)maze[i].length(); j++)
         {
             // j - x coordinate
             if (maze[i][j] == 'P')
