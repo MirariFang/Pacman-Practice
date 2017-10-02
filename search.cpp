@@ -498,45 +498,53 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
         int curry = curr.position / wid;
         pq.pop();
         pair<int, int> currNode(currx, curry);
-        int currNode_position = currNode.first + currNode.second * wid;
+        int currNode_position = currx + curry * wid;
         if (dots.find(currNode_position) != dots.end())
         {
-            visit_init(visited, wid * hei);
             targets.erase(targets.begin() + dots[currNode_position]);
-            // endX = currx;
-            // endY = curry;
+            dots.erase(currNode_position);
+            for (size_t i = 0; i < costs.size(); i++)
+            {
+                costs[i] = std::numeric_limits<float>::infinity();
+            }
+            while (!pq.empty())
+                pq.pop();
+            costs[currx + curry * wid] = 0; // initialize start state
+            pq.push(node(currx + curry * wid, 0));
+            endX = currx;
+            endY = curry;
             // cout << endX << " " << endY << endl;
             // print_dir(dir);
-            // while (!(endX == lastX && endY == lastY))
-            // {
-            //     sol.path.insert(sol.path.begin(), dir[endY][endX]);
-            //     sol.path_cost++;
-            //     switch (dir[endY][endX])
-            //     {
-            //     case RIGHT:
-            //         endX--;
-            //         break;
-            //     case DOWN:
-            //         endY--;
-            //         break;
-            //     case LEFT:
-            //         endX++;
-            //         break;
-            //     case UP:
-            //         endY++;
-            //         break;
-            //     default:
-            //         fprintf(stderr, "ERROR: out of bound\n");
-            //         exit(1);
-            //     }
-            // }
-            // lastX = currx;
-            // lastY = curry;
-            // for (size_t i = 0; i < dir.size(); i++)
-            // {
-            //     for (size_t j = 0; j < dir[i].size(); j++)
-            //         dir[i][j] = 4;
-            // }
+            while (!(endX == lastX && endY == lastY))
+            {
+                sol.path.insert(sol.path.begin(), dir[endY][endX]);
+                sol.path_cost++;
+                switch (dir[endY][endX])
+                {
+                case RIGHT:
+                    endX--;
+                    break;
+                case DOWN:
+                    endY--;
+                    break;
+                case LEFT:
+                    endX++;
+                    break;
+                case UP:
+                    endY++;
+                    break;
+                default:
+                    fprintf(stderr, "ERROR: out of bound\n");
+                    exit(1);
+                }
+            }
+            lastX = currx;
+            lastY = curry;
+            for (size_t k = 0; k < dir.size(); k++)
+            {
+                for (size_t l = 0; l < dir[k].size(); l++)
+                    dir[k][l] = 4;
+            }
         }
         if (targets.size() == 0)
             break;
@@ -572,14 +580,13 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
                         }
                         float predict = newcost + min;
                         pq.push(node(tempx + tempy * wid, predict));
-
                         dir[tempy][tempx] = i;
                     }
                 }
             }
         }
     }
-    cout << "Hello:" << endl;
+
     cout << sol.path_cost << endl;
     cout << sol.nodes << endl;
     return sol;
