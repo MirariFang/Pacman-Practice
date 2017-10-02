@@ -545,6 +545,8 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
         node curr = pq_top(pq);
         int currx = curr.position % wid;
         int curry = curr.position / wid;
+        if (pq.size() == 1)
+            sol.path_cost = costs[curr.position];
         pq_pop(pq);
         pair<int, int> currNode(currx, curry);
         int currNode_position = currx + curry * wid;
