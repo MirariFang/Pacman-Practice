@@ -457,6 +457,7 @@ Solution Search::greedy(vector<string> maze, int x, int y, int finalx, int final
  */
 Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int, int>> targets)
 {
+    vector<string> newmaze = maze;
     int lastX = x, lastY = y;
     Solution sol;
     int wid = maze[0].length();
@@ -489,6 +490,8 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
         }
     }
     int endX = -1, endY = -1;
+    vector<vector<int>> _path;
+    int count = 0;
     while (!pq.empty())
     {
         node curr = pq.top();
@@ -511,10 +514,17 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
             pq.push(node(currx + curry * wid, 0));
             endX = currx;
             endY = curry;
+            if (count <= 8)
+                newmaze[curry][currx] = '1' + count;
+            else
+                newmaze[curry][currx] = 'a' + (count - 9);
+            vector<int> temp_vec;
+            _path.push_back(temp_vec);
             while (!(endX == lastX && endY == lastY))
             {
                 //TODO: path output
-                sol.path.insert(sol.path.begin(), dir[endY][endX]);
+                //sol.path.insert(sol.path.begin(), dir[endY][endX]);
+                _path[count].insert(_path[count].begin(), dir[endY][endX]);
                 sol.path_cost++;
                 switch (dir[endY][endX])
                 {
@@ -535,6 +545,7 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
                     exit(1);
                 }
             }
+            count++;
             lastX = currx;
             lastY = curry;
             for (size_t k = 0; k < dir.size(); k++)
@@ -583,8 +594,10 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
             }
         }
     }
-    for (size_t i = 0; i < sol.path.size(); i++)
-        cout << sol.path[i];
+    for(size_t i = 0; i < newmaze.size(); i++)
+    {
+        cout << newmaze[i] << endl;
+    }
     cout << endl;
     cout << sol.path_cost << endl;
     cout << sol.nodes << endl;
