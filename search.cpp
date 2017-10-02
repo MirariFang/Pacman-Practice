@@ -9,6 +9,7 @@
 #define LEFT 2
 #define UP 3
 
+vector<vector<int>> dfsDir;
 // Used in A* search
 class node
 {
@@ -65,58 +66,80 @@ bool canTravel(vector<string> maze, int x, int y, int dir)
 }
 
 // A helper fuction of DFS
-Solution DFS_recursive(vector<string> maze, int x, int y, int tx, int ty, Solution currSol)
+void DFS_recursive(vector<string> maze, int x, int y, int tx, int ty)
 {
     int wid = maze[0].length();
     visited[x + y * wid] = true;
-    Solution newSol(currSol);
-    if (x == tx && y == ty)
-    {
-        return newSol;
-    }
-    newSol.path_cost++;
-    Solution retSol;
     if (canTravel(maze, x, y, RIGHT))
     {
         nodes_expand++;
-        newSol.path.push_back(RIGHT);
-        if (retSol.path.size() == 0)
-            retSol = DFS_recursive(maze, x + 1, y, tx, ty, newSol);
+        dfsDir[y][x + 1] = RIGHT;
+        DFS_recursive(maze, x + 1, y, tx, ty);
     }
     if (canTravel(maze, x, y, DOWN))
     {
         nodes_expand++;
-        newSol.path.push_back(DOWN);
-        if (retSol.path.size() == 0)
-            retSol = DFS_recursive(maze, x, y + 1, tx, ty, newSol);
+        dfsDir[y + 1][x] = DOWN;
+        DFS_recursive(maze, x, y + 1, tx, ty);
     }
     if (canTravel(maze, x, y, LEFT))
     {
         nodes_expand++;
-        newSol.path.push_back(LEFT);
-        if (retSol.path.size() == 0)
-            retSol = DFS_recursive(maze, x - 1, y, tx, ty, newSol);
+        dfsDir[y][x - 1] = LEFT;
+        DFS_recursive(maze, x - 1, y, tx, ty);
     }
     if (canTravel(maze, x, y, UP))
     {
         nodes_expand++;
-        newSol.path.push_back(UP);
-        if (retSol.path.size() == 0)
-            retSol = DFS_recursive(maze, x, y - 1, tx, ty, newSol);
+        dfsDir[y - 1][x] = UP;
+        DFS_recursive(maze, x, y - 1, tx, ty);
     }
-    return retSol;
 }
 
 Solution Search::DFS(vector<string> maze, int x, int y, int tx, int ty)
 {
+    nodes_expand = 0;
     int wid = maze[0].length();
     int hei = maze.size();
     visit_init(visited, wid * hei);
-    Solution currSol;
+    for (int i = 0; i < hei; i++)
+    {
+        vector<int> temp;
+        dfsDir.push_back(temp);
+        for (int j = 0; j < wid; j++)
+        {
+            dfsDir[i].push_back(4);
+        }
+    }
     nodes_expand++;
     Solution sol;
-    sol = DFS_recursive(maze, x, y, tx, ty, currSol);
+    DFS_recursive(maze, x, y, tx, ty);
     sol.nodes = nodes_expand;
+    int endX = tx, endY = ty;
+    while (!(endX == x && endY == y))
+    {
+        sol.path.insert(sol.path.begin(), dfsDir[endY][endX]);
+        sol.path_cost++;
+        maze[endY][endX] = '.';
+        switch (dfsDir[endY][endX])
+        {
+        case RIGHT:
+            endX--;
+            break;
+        case DOWN:
+            endY--;
+            break;
+        case LEFT:
+            endX++;
+            break;
+        case UP:
+            endY++;
+            break;
+        default:
+            fprintf(stderr, "ERROR: out of bound\n");
+            exit(1);
+        }
+    }
     return sol;
 }
 
@@ -430,3 +453,134 @@ Solution Search::greedy(vector<string> maze, int x, int y, int finalx, int final
     sol.nodes = nodes_expand;
     return sol;
 } //end of greedy, cost is manhattan distance in greedy
+
+/**
+ * This is the A* search for 1.2.
+ */
+Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int, int>> targets)
+{
+    int lastX = x, lastY = y;
+    Solution sol;
+    int wid = maze[0].length();
+    int hei = maze.size();
+    visit_init(visited, wid * hei);
+    unordered_map<int, int> dots;
+    for (size_t i = 0; i < targets.size(); i++)
+    {
+        int _position = targets[i].first + targets[i].second * wid;
+        dots[_position] = (int)i;
+    }
+    std::priority_queue<node> pq;
+    vector<float> costs; // cost to go to every node
+    costs.resize(wid * (hei + 1));
+    for (size_t i = 0; i < costs.size(); i++)
+    {
+        costs[i] = std::numeric_limits<float>::infinity();
+    }
+    costs[x + y * wid] = 0; // initialize start state
+    pq.push(node(x + y * wid, 0));
+    vector<vector<int>> dir; // The moving direction of the Pacman
+    // Initialize dir
+    for (int i = 0; i < hei; i++)
+    {
+        vector<int> temp;
+        dir.push_back(temp);
+        for (int j = 0; j < wid; j++)
+        {
+            dir[i].push_back(4);
+        }
+    }
+    int endX = -1, endY = -1;
+    while (!pq.empty())
+    {
+        node curr = pq.top();
+        int currx = curr.position % wid;
+        int curry = curr.position / wid;
+        pq.pop();
+        pair<int, int> currNode(currx, curry);
+        int currNode_position = currNode.first + currNode.second * wid;
+        if (dots.find(currNode_position) != dots.end())
+        {
+            visit_init(visited, wid * hei);
+            targets.erase(targets.begin() + dots[currNode_position]);
+            // endX = currx;
+            // endY = curry;
+            // cout << endX << " " << endY << endl;
+            // print_dir(dir);
+            // while (!(endX == lastX && endY == lastY))
+            // {
+            //     sol.path.insert(sol.path.begin(), dir[endY][endX]);
+            //     sol.path_cost++;
+            //     switch (dir[endY][endX])
+            //     {
+            //     case RIGHT:
+            //         endX--;
+            //         break;
+            //     case DOWN:
+            //         endY--;
+            //         break;
+            //     case LEFT:
+            //         endX++;
+            //         break;
+            //     case UP:
+            //         endY++;
+            //         break;
+            //     default:
+            //         fprintf(stderr, "ERROR: out of bound\n");
+            //         exit(1);
+            //     }
+            // }
+            // lastX = currx;
+            // lastY = curry;
+            // for (size_t i = 0; i < dir.size(); i++)
+            // {
+            //     for (size_t j = 0; j < dir[i].size(); j++)
+            //         dir[i][j] = 4;
+            // }
+        }
+        if (targets.size() == 0)
+            break;
+        else
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                int tempx = currx;
+                int tempy = curry;
+                if (canTravel(maze, currx, curry, i))
+                {
+                    if (i == RIGHT)
+                        tempx++;
+                    if (i == DOWN)
+                        tempy++;
+                    if (i == LEFT)
+                        tempx--;
+                    if (i == UP)
+                        tempy--;
+                    float newcost = costs[curr.position] + 1;
+                    sol.nodes++;
+                    if (newcost < costs[tempx + tempy * wid])
+                    {
+                        costs[tempx + tempy * wid] = newcost;
+                        float h = 0;
+                        // Use the min(dist(currloc, eachDot)) as heuristic function
+                        int min = INT_MAX;
+                        for (size_t i = 0; i < targets.size(); i++)
+                        {
+                            h = heuristic(tempx, tempy, (float)targets[i].first, (float)targets[i].second);
+                            if (h < min)
+                                min = h;
+                        }
+                        float predict = newcost + min;
+                        pq.push(node(tempx + tempy * wid, predict));
+
+                        dir[tempy][tempx] = i;
+                    }
+                }
+            }
+        }
+    }
+    cout << "Hello:" << endl;
+    cout << sol.path_cost << endl;
+    cout << sol.nodes << endl;
+    return sol;
+}

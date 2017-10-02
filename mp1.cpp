@@ -78,5 +78,39 @@ int main()
     }
     sol = do_search(maze, startx, starty, finalx, finaly, search_method);
     sol.drawSolution("mp1_1_sol.txt", maze, startx, starty);
+
+    ifstream inFile2;
+    inFile2.open("maze2.txt");
+    startx = 0;
+    starty = 0;
+    vector<string> maze2;
+    vector<pair<int, int>> targets;
+    while (inFile2.good())
+    {
+        getline(inFile2, temp);
+        if (temp.compare("") == 0)
+            break;
+        maze2.push_back(temp);
+    }
+    for (int i = 0; i < (int)maze2.size(); i++)
+    {
+        // i - y coordinate
+        for (int j = 0; j < (int)maze2[i].length(); j++)
+        {
+            // j - x coordinate
+            if (maze2[i][j] == 'P')
+            {
+                startx = j;
+                starty = i;
+            }
+            if (maze2[i][j] == '.')
+            {
+                pair<int, int> newNode(j, i);
+                targets.push_back(newNode);
+            }
+        }
+    }
+    Solution sol2;
+    sol2 = Search::super_Astar(maze2, startx, starty, targets);
     return 0;
 }

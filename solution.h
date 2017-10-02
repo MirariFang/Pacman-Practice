@@ -17,7 +17,6 @@ class Solution
     vector<int> path; // Path cosists of a series of directions
     int path_cost;    // The path cost of the solution, defined as the number of steps taken to get from the initial state to the goal state.
     int nodes;        // Number of nodes expanded by the search algorithm.
-
     Solution();
     Solution(Solution &other); 
 

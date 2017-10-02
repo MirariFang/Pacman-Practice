@@ -10,7 +10,10 @@
 #include <limits>
 #include <cmath>
 #include <stdlib.h>
+#include <unordered_map>
 #include "solution.h"
+#include <climits>
+
 using namespace std;
 
 /**
@@ -23,10 +26,7 @@ class Search
     static Solution BFS(vector<string> maze, int x, int y, int tx, int ty);
     static Solution greedy(vector<string> maze, int x, int y, int finalx, int finaly);
     static Solution A_star(vector<string> maze, int x, int y, int finalx, int finaly);
-
-//   private:
-//     void visit_init(vector<bool> &visit);
-//     bool canTravel(vector<string> maze, int x, int y, int dir);
+    static Solution super_Astar(vector<string> maze, int x, int y, vector<pair<int, int>> targets);
 };
 
 #endif
