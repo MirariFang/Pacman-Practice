@@ -8,13 +8,25 @@
 #include "test.h"
 using namespace std;
 
+#define BFS_SEARCH 0
+#define DFS_SEARCH 1
+#define A_STAR_SEARCH 2
+#define GREEDY_SEARCH 3
+
 vector<string> maze;
 
-Solution do_search(vector<string> m, int x, int y, int tx, int ty)
+//TODO: find a better way to output all four results into one .txt file
+Solution do_search(vector<string> m, int x, int y, int tx, int ty, int search)
 {
-    //TODO: Choose searching algorithm
     Solution sol;
-    sol = Search::BFS(m, x, y, tx, ty);
+    if (search == BFS_SEARCH)
+        sol = Search::BFS(m, x, y, tx, ty);
+    else if (search == DFS_SEARCH)
+        sol = Search::DFS(m, x, y, tx, ty);
+    else if (search == A_STAR_SEARCH)
+        sol = Search::A_star(m, x, y, tx, ty);
+    else
+        sol = Search::greedy(m, x, y, tx, ty);
     return sol;
 }
 
@@ -55,7 +67,16 @@ int main()
         }
     }
     Solution sol;
-    sol = do_search(maze, startx, starty, finalx, finaly);
+    int search_method;
+    cout << "Please choose search method: " << endl;
+    cout << "0.BFS 1.DFS 2.A* 3.Greedy" << endl;
+    cin >> search_method;
+    if (search_method > 3 || search_method < 0)
+    {
+        cout << "Invalid search method." << endl;
+        exit(1);
+    }
+    sol = do_search(maze, startx, starty, finalx, finaly, search_method);
     sol.drawSolution("mp1_1_sol.txt", maze, startx, starty);
     return 0;
 }

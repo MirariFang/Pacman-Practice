@@ -240,13 +240,13 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
     pq.push(node(x + y * wid, 0));
     vector<vector<int>> dir; // The moving direction of the Pacman
     // Initialize dir
-    for (int i = 0; i < wid; i++)
+    for (int i = 0; i < hei; i++)
     {
         vector<int> temp;
         dir.push_back(temp);
-        for (int j = 0; j < hei; j++)
+        for (int j = 0; j < wid; j++)
         {
-            dir[i].push_back(-1);
+            dir[i].push_back(4);
         }
     }
     while (!pq.empty())
@@ -282,7 +282,7 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
                         costs[tempx + tempy * wid] = newcost;
                         float predict = newcost + heuristic(tempx, tempy, finalx, finaly);
                         pq.push(node(tempx + tempy * wid, predict));
-                        dir[tempx][tempy] = i;
+                        dir[tempy][tempx] = i;
                     }
                 }
             }
@@ -290,11 +290,11 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
     }
     int endX = finalx;
     int endY = finaly;
-    while (endX != x && endY != y)
+    while (!(endX == x && endY == y))
     {
-        sol.path.insert(sol.path.begin(), dir[endX][endY]);
+        sol.path.insert(sol.path.begin(), dir[endY][endX]);
         sol.path_cost++;
-        switch(dir[endX][endY])
+        switch (dir[endY][endX])
         {
         case RIGHT:
             endX--;
@@ -316,24 +316,24 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
     return sol;
 }
 
-void Search::greedy(vector<string> maze, int x, int y, int finalx, int finaly)
+Solution Search::greedy(vector<string> maze, int x, int y, int finalx, int finaly)
 {
-    //Solution sol();
+    Solution sol;
     visit_init(visited, maze.size() * maze[0].length());
     int wid = maze[0].length();
     int hei = maze.size();
     int finalposition = finalx + finaly * wid;
     std::priority_queue<node> pq;
     pq.push(node(x + y * wid, heuristic(x, y, finalx, finaly)));
-    vector<vector<int> > dir; // The moving direction of the Pacman
+    vector<vector<int>> dir; // The moving direction of the Pacman
     // Initialize dir
-    for (int i = 0; i < wid; i++)
+    for (int i = 0; i < hei; i++)
     {
         vector<int> v;
         dir.push_back(v);
-        for (int j = 0; j < hei; j++)
+        for (int j = 0; j < wid; j++)
         {
-            dir[i].push_back(-1);
+            dir[i].push_back(4);
         }
     }
     while (!pq.empty())
@@ -341,57 +341,92 @@ void Search::greedy(vector<string> maze, int x, int y, int finalx, int finaly)
         node curr = pq.top();
         pq.pop();
         nodes_expand++;
-      //  sol.nodes++;
+        //  sol.nodes++;
         if (curr.position == finalposition)
         {
-          cout << "found" << endl;
+            cout << "found" << endl;
             break;
         }
         else
         {
             int currx = curr.position % wid;
             int curry = curr.position / wid;
-            if (!visited[currx + curry * wid]){
-            visited[currx + curry * wid] = VISITED;
-            for (int i = 0; i < 4; i++)
+            if (!visited[currx + curry * wid])
             {
-                int tempx = currx;
-                int tempy = curry;
-                if (canTravel(maze, currx, curry, i))
+                visited[currx + curry * wid] = VISITED;
+                for (int i = 0; i < 4; i++)
                 {
-                    if (i == RIGHT){
-                        tempx++;
-                        if (!visited[tempx + tempy * wid]){
-                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
-                        dir[tempx][tempy] = i;
+                    int tempx = currx;
+                    int tempy = curry;
+                    if (canTravel(maze, currx, curry, i))
+                    {
+                        if (i == RIGHT)
+                        {
+                            tempx++;
+                            if (!visited[tempx + tempy * wid])
+                            {
+                                pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                                dir[tempy][tempx] = i;
+                            }
                         }
-                    }
-                    if (i == DOWN){
-                        tempy++;
-                        if (!visited[tempx + tempy * wid]){
-                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
-                        dir[tempx][tempy] = i;
+                        if (i == DOWN)
+                        {
+                            tempy++;
+                            if (!visited[tempx + tempy * wid])
+                            {
+                                pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                                dir[tempy][tempx] = i;
+                            }
                         }
-                    }
-                    if (i == LEFT){
-                        tempx--;
-                        if (!visited[tempx + tempy * wid]){
-                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
-                        dir[tempx][tempy] = i;
+                        if (i == LEFT)
+                        {
+                            tempx--;
+                            if (!visited[tempx + tempy * wid])
+                            {
+                                pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                                dir[tempy][tempx] = i;
+                            }
                         }
-                    }
-                    if (i == UP){
-                        tempy--;
-                        if (!visited[tempx + tempy * wid]){
-                        pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
-                        dir[tempx][tempy] = i;
+                        if (i == UP)
+                        {
+                            tempy--;
+                            if (!visited[tempx + tempy * wid])
+                            {
+                                pq.push(node(tempx + tempy * wid, heuristic(tempx, tempy, finalx, finaly)));
+                                dir[tempy][tempx] = i;
+                            }
                         }
-                    }
-                }//end of if canTravel
-            }
-          }//end of if not-visited
+                    } //end of if canTravel
+                }
+            } //end of if not-visited
         }
     }
-    cout <<"nodes_expand: "<< nodes_expand <<endl;
-}//end of greedy, cost is manhattan distance in greedy
-
+    int endX = finalx;
+    int endY = finaly;
+    while (!(endX == x && endY == y))
+    {
+        sol.path.insert(sol.path.begin(), dir[endY][endX]);
+        sol.path_cost++;
+        maze[endY][endX] = '.';
+        switch (dir[endY][endX])
+        {
+        case RIGHT:
+            endX--;
+            break;
+        case DOWN:
+            endY--;
+            break;
+        case LEFT:
+            endX++;
+            break;
+        case UP:
+            endY++;
+            break;
+        default:
+            fprintf(stderr, "ERROR: out of bound\n");
+            exit(1);
+        }
+    }
+    sol.nodes = nodes_expand;
+    return sol;
+} //end of greedy, cost is manhattan distance in greedy
