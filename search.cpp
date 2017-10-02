@@ -452,6 +452,52 @@ Solution Search::greedy(vector<string> maze, int x, int y, int finalx, int final
     return sol;
 } //end of greedy, cost is manhattan distance in greedy
 
+// pushing function for vector-based pqueue
+void pq_push(vector<node> &q, node n)
+{
+    for (size_t i = 0; i < q.size(); i++)
+    {
+        if (q[i].position == n.position)
+        {
+            q[i].cost = n.cost;
+            return;
+        }  
+    }
+    q.push_back(n);
+}
+
+// top() function for vector-based pqueue
+node pq_top(vector<node> q)
+{
+    float min = FLT_MAX;
+    int mini = 0;
+    for (size_t i = 0; i < q.size(); i++)
+    {
+        if (min > q[i].cost)
+        {
+            min = q[i].cost;
+            mini = i;
+        }
+    }
+    return q[mini];
+}
+
+// pop function for vector-based pqueue
+void pq_pop(vector<node> &q)
+{
+    float min = FLT_MAX;
+    int mini = 0;
+    for (size_t i = 0; i < q.size(); i++)
+    {
+        if (min > q[i].cost)
+        {
+            min = q[i].cost;
+            mini = i;
+        }
+    }
+    q.erase(q.begin() + mini);
+}
+
 /**
  * This is the A* search for 1.2.
  */
@@ -469,7 +515,8 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
         int _position = targets[i].first + targets[i].second * wid;
         dots[_position] = (int)i;
     }
-    std::priority_queue<node> pq;
+    //std::priority_queue<node> pq;
+    vector<node> pq;
     vector<float> costs; // cost to go to every node
     costs.resize(wid * (hei + 1));
     for (size_t i = 0; i < costs.size(); i++)
@@ -477,7 +524,8 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
         costs[i] = std::numeric_limits<float>::infinity();
     }
     costs[x + y * wid] = 0; // initialize start state
-    pq.push(node(x + y * wid, 0));
+    //pq.push(node(x + y * wid, 0));
+    pq_push(pq, node(x + y * wid, 0));
     vector<vector<int>> dir; // The moving direction of the Pacman
     // Initialize dir
     for (int i = 0; i < hei; i++)
@@ -494,10 +542,10 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
     int count = 0;
     while (!pq.empty())
     {
-        node curr = pq.top();
+        node curr = pq_top(pq);
         int currx = curr.position % wid;
         int curry = curr.position / wid;
-        pq.pop();
+        pq_pop(pq);
         pair<int, int> currNode(currx, curry);
         int currNode_position = currx + curry * wid;
         if (dots.find(currNode_position) != dots.end())
@@ -506,12 +554,13 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
             dots.erase(currNode_position);
             for (size_t i = 0; i < costs.size(); i++)
             {
-                costs[i] = std::numeric_limits<float>::infinity();
+                if ((int)i != currx + curry * wid)
+                    costs[i] = std::numeric_limits<float>::infinity();
             }
+            //costs[currx + curry * wid] = 0; // initialize start state
             while (!pq.empty())
-                pq.pop();
-            costs[currx + curry * wid] = 0; // initialize start state
-            pq.push(node(currx + curry * wid, 0));
+                pq_pop(pq);
+            pq_push(pq, node(currx + curry * wid, 0));
             endX = currx;
             endY = curry;
             if (count <= 8)
@@ -520,31 +569,33 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
                 newmaze[curry][currx] = 'a' + (count - 9);
             vector<int> temp_vec;
             _path.push_back(temp_vec);
-            while (!(endX == lastX && endY == lastY))
-            {
-                //TODO: path output
-                //sol.path.insert(sol.path.begin(), dir[endY][endX]);
-                _path[count].insert(_path[count].begin(), dir[endY][endX]);
-                sol.path_cost++;
-                switch (dir[endY][endX])
-                {
-                case RIGHT:
-                    endX--;
-                    break;
-                case DOWN:
-                    endY--;
-                    break;
-                case LEFT:
-                    endX++;
-                    break;
-                case UP:
-                    endY++;
-                    break;
-                default:
-                    fprintf(stderr, "ERROR: out of bound\n");
-                    exit(1);
-                }
-            }
+            //print_dir(dir);
+            // while (!(endX == lastX && endY == lastY))
+            // {
+
+            //     //TODO: path output
+            //     //sol.path.insert(sol.path.begin(), dir[endY][endX]);
+            //     _path[count].insert(_path[count].begin(), dir[endY][endX]);
+            //     sol.path_cost++;
+            //     switch (dir[endY][endX])
+            //     {
+            //     case RIGHT:
+            //         endX--;
+            //         break;
+            //     case DOWN:
+            //         endY--;
+            //         break;
+            //     case LEFT:
+            //         endX++;
+            //         break;
+            //     case UP:
+            //         endY++;
+            //         break;
+            //     default:
+            //         fprintf(stderr, "ERROR: out of bound\n");
+            //         exit(1);
+            //     }
+            // }
             count++;
             lastX = currx;
             lastY = curry;
@@ -573,23 +624,23 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
                     if (i == UP)
                         tempy--;
                     float newcost = costs[curr.position] + 1;
-                    if (newcost < costs[tempx + tempy * wid])
+                    // if (newcost < costs[tempx + tempy * wid])
+                    // {
+                    costs[tempx + tempy * wid] = newcost;
+                    float h = 0;
+                    // Use the min(dist(currloc, eachDot)) as heuristic function
+                    int min = INT_MAX;
+                    for (size_t i = 0; i < targets.size(); i++)
                     {
-                        costs[tempx + tempy * wid] = newcost;
-                        float h = 0;
-                        // Use the min(dist(currloc, eachDot)) as heuristic function
-                        int min = INT_MAX;
-                        for (size_t i = 0; i < targets.size(); i++)
-                        {
-                            h = heuristic(tempx, tempy, (float)targets[i].first, (float)targets[i].second);
-                            if (h < min)
-                                min = h;
-                        }
-                        float predict = newcost + min;
-                        pq.push(node(tempx + tempy * wid, predict));
-                        dir[tempy][tempx] = i;
-                        sol.nodes++;
+                        h = heuristic(tempx, tempy, (float)targets[i].first, (float)targets[i].second);
+                        if (h < min)
+                            min = h;
                     }
+                    float predict = newcost + min;
+                    pq_push(pq, node(tempx + tempy * wid, predict));
+                    dir[tempy][tempx] = i;
+                    sol.nodes++;
+                    //}
                 }
             }
         }

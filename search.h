@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include "solution.h"
 #include <climits>
-
+#include <cfloat>
 using namespace std;
 
 /**
