@@ -278,9 +278,7 @@ Solution Search::A_star(vector<string> maze, int x, int y, int finalx, int final
         pq.pop();
         sol.nodes++;
         if (curr.position == finalposition)
-        {
             break;
-        }
         else
         {
             int currx = curr.position % wid;
@@ -513,10 +511,9 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
             pq.push(node(currx + curry * wid, 0));
             endX = currx;
             endY = curry;
-            // cout << endX << " " << endY << endl;
-            // print_dir(dir);
             while (!(endX == lastX && endY == lastY))
             {
+                //TODO: path output
                 sol.path.insert(sol.path.begin(), dir[endY][endX]);
                 sol.path_cost++;
                 switch (dir[endY][endX])
@@ -565,7 +562,6 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
                     if (i == UP)
                         tempy--;
                     float newcost = costs[curr.position] + 1;
-                    sol.nodes++;
                     if (newcost < costs[tempx + tempy * wid])
                     {
                         costs[tempx + tempy * wid] = newcost;
@@ -581,12 +577,15 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
                         float predict = newcost + min;
                         pq.push(node(tempx + tempy * wid, predict));
                         dir[tempy][tempx] = i;
+                        sol.nodes++;
                     }
                 }
             }
         }
     }
-
+    for (size_t i = 0; i < sol.path.size(); i++)
+        cout << sol.path[i];
+    cout << endl;
     cout << sol.path_cost << endl;
     cout << sol.nodes << endl;
     return sol;
