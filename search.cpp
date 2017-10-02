@@ -545,13 +545,13 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
         node curr = pq_top(pq);
         int currx = curr.position % wid;
         int curry = curr.position / wid;
-        if (pq.size() == 1)
-            sol.path_cost = costs[curr.position];
         pq_pop(pq);
         pair<int, int> currNode(currx, curry);
         int currNode_position = currx + curry * wid;
         if (dots.find(currNode_position) != dots.end())
         {
+            if (targets.size() == 1)
+                sol.path_cost = costs[currx + curry * wid];
             targets.erase(targets.begin() + dots[currNode_position]);
             dots.erase(currNode_position);
             for (size_t i = 0; i < costs.size(); i++)
@@ -562,7 +562,7 @@ Solution Search::super_Astar(vector<string> maze, int x, int y, vector<pair<int,
             //costs[currx + curry * wid] = 0; // initialize start state
             while (!pq.empty())
                 pq_pop(pq);
-            pq_push(pq, node(currx + curry * wid, 0));
+            pq_push(pq, node(currx + curry * wid, costs[currx + curry * wid]));
             endX = currx;
             endY = curry;
             if (count <= 8)
